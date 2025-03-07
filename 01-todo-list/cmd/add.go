@@ -16,22 +16,23 @@ var addCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("add called")
-		parseName()
+		fmt.Println(args)
+		parseDesc()
 	},
 }
 
-func parseName() {
-	if name == "" {
-		fmt.Println("No name set!")
+func parseDesc() {
+	if description == "" {
+		fmt.Println("You need to provide a description for your task!")
 		return
 	}
 
-	fmt.Println("Name was set to: " + name)
+	fmt.Println("Added task: \" " + description + "\".")
 }
 
-var name string
+var description string
 
 func init() {
 	rootCmd.AddCommand(addCmd)
-	addCmd.Flags().StringVarP(&name, "name", "n", "", "Help message for name")
+	addCmd.Flags().StringVarP(&description, "description", "d", "", "A description of your task.")
 }
