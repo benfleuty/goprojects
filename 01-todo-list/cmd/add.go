@@ -14,6 +14,7 @@ var addCmd = &cobra.Command{
 	Use:   "add",
 	Short: "Adds a task",
 	Long:  ``,
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("add called")
 		fmt.Println(args)
