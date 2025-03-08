@@ -1,0 +1,27 @@
+# Custom
+**/*/todoapp
+
+
+# Go files & IDE files to ignore
+# Compiled binary files
+*.exe
+*.out
+*.o
+*.a
+*.so
+*.dll
+
+# Go build artifacts
+/build/
+/bin/
+/pkg/
+*.test
+
+# Dependencies (if vendoring is not needed)
+vendor/
+
+# IDE/Editor temporary files
+*.swp
+*.swo
+*.bak
+*~
