@@ -8,14 +8,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/benfleuty/goprojects/todoapp/model"
 	"github.com/spf13/cobra"
 )
-
-type Task struct {
-	Description string
-	Created     int64
-	Done        bool
-}
 
 var listCmd = &cobra.Command{
 	Use:   "list",
@@ -32,14 +27,14 @@ var listCmd = &cobra.Command{
 	},
 }
 
-var tasks []Task
+var tasks []model.Task
 
 func init() {
 	rootCmd.AddCommand(listCmd)
 	tasks = append(tasks,
-		Task{Description: "Clean the kitchen", Created: time.Now().Unix(), Done: false},
-		Task{Description: "Make the bed", Created: time.Now().Unix() - (3600 * 6), Done: true},
-		Task{Description: "Learn more Go!", Created: time.Now().Unix() - (3600 * 3), Done: false},
-		Task{Description: "Feed the Gopher", Created: time.Now().Unix() - 3600, Done: true},
+		model.Task{Description: "Clean the kitchen", Created: time.Now().Unix(), Done: false},
+		model.Task{Description: "Make the bed", Created: time.Now().Unix() - (3600 * 6), Done: true},
+		model.Task{Description: "Learn more Go!", Created: time.Now().Unix() - (3600 * 3), Done: false},
+		model.Task{Description: "Feed the Gopher", Created: time.Now().Unix() - 3600, Done: true},
 	)
 }
