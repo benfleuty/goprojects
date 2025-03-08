@@ -12,14 +12,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	tasks        []model.Task
+	showAllTasks bool
+)
+
 var listCmd = &cobra.Command{
 	Use:   "list",
-	Short: "Lists all your tasks.",
+	Short: "Lists your tasks.",
+	Long: `Lists your tasks.
+		Only shows defaults tasks by default.
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		var builder strings.Builder
 		out := fmt.Sprintf("%s\t%-20s\t%-12s\t%s\n", "ID", "Description", "Created", "Done?")
 		builder.WriteString(out)
 		for i, task := range tasks {
+			if task.Done && !showAllTasks {
+				continue
+			}
 			out := fmt.Sprintf("%d\t%-20s\t%d\t%t\n", i+1, task.Description, task.Created, task.Done)
 			builder.WriteString(out)
 		}
@@ -27,10 +38,10 @@ var listCmd = &cobra.Command{
 	},
 }
 
-var tasks []model.Task
-
 func init() {
 	rootCmd.AddCommand(listCmd)
+	listCmd.Flags().BoolVarP(&showAllTasks, "all", "a", false, "Shows all tasks.")
+
 	tasks = append(tasks,
 		model.Task{Description: "Clean the kitchen", Created: time.Now().Unix(), Done: false},
 		model.Task{Description: "Make the bed", Created: time.Now().Unix() - (3600 * 6), Done: true},
