@@ -4,17 +4,20 @@ Copyright © 2025 Ben Fleuty <github.com/benfleuty>
 package cmd
 
 import (
+	"encoding/csv"
 	"fmt"
+	"log"
+	"os"
+	"strconv"
 	"strings"
-	"time"
 
 	"github.com/benfleuty/goprojects/todoapp/model"
 	"github.com/spf13/cobra"
 )
 
 var (
-	tasks        []model.Task
 	showAllTasks bool
+	tasks        []model.Task
 )
 
 var listCmd = &cobra.Command{
@@ -24,17 +27,15 @@ var listCmd = &cobra.Command{
 		Only shows defaults tasks by default.
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		var builder strings.Builder
-		out := fmt.Sprintf("%s\t%-20s\t%-12s\t%s\n", "ID", "Description", "Created", "Done?")
-		builder.WriteString(out)
+		var b strings.Builder
+		fmt.Fprintf(&b, "%s\t%-20s\t%-12s\t%s\n", "ID", "Description", "Created", "Done?")
 		for i, task := range tasks {
 			if task.Done && !showAllTasks {
 				continue
 			}
-			out := fmt.Sprintf("%d\t%-20s\t%d\t%t\n", i+1, task.Description, task.Created, task.Done)
-			builder.WriteString(out)
+			fmt.Fprintf(&b, "%d\t%-20s\t%d\t%t\n", i+1, task.Description, task.Created, task.Done)
 		}
-		fmt.Println(builder.String())
+		fmt.Println(b.String())
 	},
 }
 
@@ -42,10 +43,63 @@ func init() {
 	rootCmd.AddCommand(listCmd)
 	listCmd.Flags().BoolVarP(&showAllTasks, "all", "a", false, "Shows all tasks.")
 
-	tasks = append(tasks,
-		model.Task{Description: "Clean the kitchen", Created: time.Now().Unix(), Done: false},
-		model.Task{Description: "Make the bed", Created: time.Now().Unix() - (3600 * 6), Done: true},
-		model.Task{Description: "Learn more Go!", Created: time.Now().Unix() - (3600 * 3), Done: false},
-		model.Task{Description: "Feed the Gopher", Created: time.Now().Unix() - 3600, Done: true},
-	)
+	taskRecords, err := readCsv("db.csv")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	tasks = parseTasks(taskRecords)
+}
+
+func parseTasks(records [][]string) []model.Task {
+	if len(records) == 0 {
+		return []model.Task{}
+	}
+
+	var tasks []model.Task
+
+	for _, record := range records {
+		if len(record) < 4 {
+			continue
+		}
+
+		id, err := strconv.Atoi(record[0])
+		if err != nil {
+			continue
+		}
+		description := record[1]
+		created, err := strconv.Atoi(record[2])
+		if err != nil {
+			created = -1
+		}
+		done, err := strconv.ParseBool(record[3])
+		if err != nil {
+			done = false
+		}
+
+		var task model.Task
+		task.ID = id
+		task.Description = description
+		task.Created = created
+		task.Done = done
+		tasks = append(tasks, task)
+	}
+
+	return tasks
+}
+
+func readCsv(path string) ([][]string, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	r := csv.NewReader(f)
+	records, err := r.ReadAll()
+	if err != nil {
+		return nil, err
+	}
+
+	return records, nil
 }
