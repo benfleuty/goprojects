@@ -4,13 +4,10 @@ Copyright © 2025 Ben Fleuty <github.com/benfleuty>
 package cmd
 
 import (
-	"encoding/csv"
 	"fmt"
-	"log"
-	"os"
-	"strconv"
 	"strings"
 
+	"github.com/benfleuty/goprojects/todoapp/data"
 	"github.com/benfleuty/goprojects/todoapp/model"
 	"github.com/spf13/cobra"
 )
@@ -43,63 +40,6 @@ func init() {
 	rootCmd.AddCommand(listCmd)
 	listCmd.Flags().BoolVarP(&showAllTasks, "all", "a", false, "Shows all tasks.")
 
-	taskRecords, err := readCsv("db.csv")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	tasks = parseTasks(taskRecords)
-}
-
-func parseTasks(records [][]string) []model.Task {
-	if len(records) == 0 {
-		return []model.Task{}
-	}
-
-	var tasks []model.Task
-
-	for _, record := range records {
-		if len(record) < 4 {
-			continue
-		}
-
-		id, err := strconv.Atoi(record[0])
-		if err != nil {
-			continue
-		}
-		description := record[1]
-		created, err := strconv.Atoi(record[2])
-		if err != nil {
-			created = -1
-		}
-		done, err := strconv.ParseBool(record[3])
-		if err != nil {
-			done = false
-		}
-
-		var task model.Task
-		task.ID = id
-		task.Description = description
-		task.Created = created
-		task.Done = done
-		tasks = append(tasks, task)
-	}
-
-	return tasks
-}
-
-func readCsv(path string) ([][]string, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	r := csv.NewReader(f)
-	records, err := r.ReadAll()
-	if err != nil {
-		return nil, err
-	}
-
-	return records, nil
+	var taskReader data.TaskReader = &data.CSVReader{FilePath: "db.csv"}
+	tasks = taskReader.GetAll()
 }
