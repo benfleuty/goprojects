@@ -40,7 +40,7 @@ func (r *CSVReader) WriteTask(desc *string) (model.Task, error) {
 		Done:        isDone,
 	}
 
-	f, err := os.Open(r.FilePath)
+	f, err := os.OpenFile(r.FilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o640)
 	if err != nil {
 		log.Fatalf("Error opening file: %v", err)
 	}
@@ -61,10 +61,7 @@ func (r *CSVReader) WriteTask(desc *string) (model.Task, error) {
 		log.Fatalf("Error writing task %v to file '%s': %v", record, r.FilePath, err)
 	}
 
-	if err != nil {
-		fmt.Printf("%v\n", task)
-		log.Fatalf("Error writing to file: %v", err)
-	}
+	w.Flush()
 
 	return task, nil
 }
