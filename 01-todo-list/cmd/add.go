@@ -6,7 +6,9 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"log"
 
+	"github.com/benfleuty/goprojects/todoapp/data"
 	"github.com/spf13/cobra"
 )
 
@@ -27,6 +29,13 @@ var addCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Print("add called with task: ")
 		fmt.Println(description)
+		var taskReader data.TaskReader = &data.CSVReader{FilePath: "db.csv"}
+		task, err := taskReader.WriteTask(&description)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Printf("Successfully created task: %v", task)
 	},
 }
 
