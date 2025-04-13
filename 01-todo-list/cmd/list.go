@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/benfleuty/goprojects/todoapp/data"
 	"github.com/benfleuty/goprojects/todoapp/model"
@@ -25,12 +26,22 @@ var listCmd = &cobra.Command{
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		var b strings.Builder
-		fmt.Fprintf(&b, "%s\t%-20s\t%-12s\t%s\n", "ID", "Description", "Created", "Done?")
-		for i, task := range tasks {
+		fmt.Fprintf(&b, "%s\t%-20s\t%-12s\t%s\n", "ID", "Task", "Created", "Completed")
+		for _, task := range tasks {
 			if task.Done && !showAllTasks {
 				continue
 			}
-			fmt.Fprintf(&b, "%d\t%-20s\t%d\t%t\n", i+1, task.Description, task.Created, task.Done)
+			id := task.ID
+			desc := task.Description
+			created := task.Created.Format(time.RFC3339)
+			var done string
+			if task.Done {
+				done = "Yes"
+			} else {
+				done = "No"
+			}
+
+			fmt.Fprintf(&b, "%d\t%-20s\t%s\t%s\n", id, desc, created, done)
 		}
 		fmt.Println(b.String())
 	},

@@ -27,15 +27,14 @@ var addCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Print("add called with task: ")
-		fmt.Println(description)
+		fmt.Println("add called with task:", description)
 		var taskReader data.TaskReader = &data.CSVReader{FilePath: "db.csv"}
 		task, err := taskReader.WriteTask(&description)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		fmt.Printf("Successfully created task: %v", task)
+		fmt.Println("Successfully created task:", task)
 	},
 }
 

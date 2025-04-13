@@ -4,12 +4,15 @@ Copyright © 2025 Ben Fleuty <github.com/benfleuty>
 
 package model
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 type Task struct {
 	ID          int
 	Description string
-	Created     int
+	Created     time.Time
 	Done        bool
 }
 
