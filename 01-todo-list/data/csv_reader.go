@@ -27,38 +27,41 @@ func (r *CSVReader) GetAll() []model.Task {
 func (r *CSVReader) WriteTask(desc *string) (model.Task, error) {
 	id, err := getNextId(r)
 	if err != nil {
-		log.Fatalf("Error generating an ID for \"%v\": %v", desc, err)
+		log.Fatalf("Error generating an ID for \"%v\": %v\n", desc, err)
 	}
 
-	now := time.Now().Unix()
-	isDone := false
+	done := false
 
 	task := model.Task{
 		ID:          id,
 		Description: *desc,
-		Created:     int(now),
-		Done:        isDone,
+		Created:     time.Now(),
+		Done:        done,
 	}
 
 	f, err := os.OpenFile(r.FilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o640)
 	if err != nil {
-		log.Fatalf("Error opening file: %v", err)
+		log.Fatalln("Error opening file: ", err)
 	}
 	defer f.Close()
 
+	idStr := strconv.Itoa(task.ID)
+	descStr := task.Description
+	createdStr := strconv.FormatInt(task.Created.Unix(), 10)
+	doneStr := strconv.FormatBool(task.Done)
 	record := []string{
-		strconv.Itoa(task.ID),
-		task.Description,
-		strconv.Itoa(task.Created),
-		strconv.FormatBool(task.Done),
+		idStr,
+		descStr,
+		createdStr,
+		doneStr,
 	}
 
-	fmt.Printf("Record: %v", record)
+	fmt.Println("Record: ", record)
 
 	w := csv.NewWriter(f)
 	err = w.Write(record)
 	if err != nil {
-		log.Fatalf("Error writing task %v to file '%s': %v", record, r.FilePath, err)
+		log.Fatalf("Error writing task %v to file '%s': %v\n", record, r.FilePath, err)
 	}
 
 	w.Flush()
@@ -101,10 +104,13 @@ func parseTasks(records [][]string) []model.Task {
 			continue
 		}
 		description := record[1]
-		created, err := strconv.Atoi(record[2])
+		createdUnixTimeStr := record[2]
+		createdUnixTimeInt, err := strconv.ParseInt(createdUnixTimeStr, 10, 64)
 		if err != nil {
-			created = -1
+			log.Fatal(err)
 		}
+
+		created := time.Unix(createdUnixTimeInt, 0)
 		done, err := strconv.ParseBool(record[3])
 		if err != nil {
 			done = false
