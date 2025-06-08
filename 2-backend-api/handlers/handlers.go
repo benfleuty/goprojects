@@ -46,7 +46,7 @@ func parseBasicCalculationRequest(w http.ResponseWriter, r *http.Request, sUuid 
 	slog.Info(fmt.Sprintf("%s %s %s request with body: %s", sUuid, r.Method, r.URL.Path, bodyBytes))
 	request := BasicCalculationRequest{}
 	if err := json.Unmarshal(bodyBytes, &request); err != nil {
-		msg := fmt.Sprintf("%s Error parsing body!", sUuid)
+		msg := fmt.Sprintf("%s Error parsing body: %v", sUuid, err)
 		slog.Error(msg)
 		http.Error(w, msg, 400)
 	}
