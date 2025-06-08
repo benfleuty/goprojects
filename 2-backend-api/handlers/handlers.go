@@ -75,20 +75,18 @@ func GetAdd(w http.ResponseWriter, r *http.Request) {
 
 func GetSubtract(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	bodyBytes, err := io.ReadAll(r.Body)
-	if err != nil {
-		msg := fmt.Sprintf("%s %s Error reading request body: %v", r.Method, r.URL.Path, err)
-		slog.Error(msg)
-		http.Error(w, msg, 400)
+	sUuid := uuid.NewString()
+
+	var request BasicCalculationRequest
+	if req, err := parseBasicCalculationRequest(w, r, sUuid); err != nil {
 		return
+	} else {
+		request = req
 	}
 
-	slog.Info(fmt.Sprintf("%s %s request with body: %s", r.Method, r.URL.Path, bodyBytes))
-
-	var data []CalculationResult
-	obj := CalculationResult{}
-	data = append(data, obj)
-	SetResponse(w, 200, data)
+	var response BasicCalculationResponse
+	response.Result = request.Number1 - request.Number2
+	SetResponse(w, 200, response)
 }
 
 func GetMultiply(w http.ResponseWriter, r *http.Request) {

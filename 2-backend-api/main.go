@@ -31,8 +31,8 @@ func endpointAdd(w http.ResponseWriter, r *http.Request) {
 
 func endpointSubtract(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	// case http.MethodGet:
-	// 	handlers.GetSubtract(w, r)
+	case http.MethodGet:
+		handlers.GetSubtract(w, r)
 	default:
 		http.Error(w, constants.METHOD_NOT_ALLOWED, http.StatusMethodNotAllowed)
 	}
