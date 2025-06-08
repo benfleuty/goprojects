@@ -49,8 +49,8 @@ func endpointMultiply(w http.ResponseWriter, r *http.Request) {
 
 func endpointDivide(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	// case http.MethodGet:
-	// 	handlers.GetDivide(w, r)
+	case http.MethodGet:
+		handlers.GetDivide(w, r)
 	default:
 		http.Error(w, constants.METHOD_NOT_ALLOWED, http.StatusMethodNotAllowed)
 	}
