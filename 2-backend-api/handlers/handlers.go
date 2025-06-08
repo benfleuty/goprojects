@@ -20,18 +20,18 @@ func SetResponse(w http.ResponseWriter, status int, data any) {
 	}
 }
 
-// Deprecated: Use SimpleCalculationRequest
+// Deprecated: Use BasicCalculationRequest
 type CalculationResult struct {
 	Operation string `json:"operation"`
 }
 
-type SimpleCalculationResponse struct {
-	Result int `json:"result"`
-}
-
-type SimpleCalculationRequest struct {
+type BasicCalculationRequest struct {
 	Number1 int `json:"number1"`
 	Number2 int `json:"number2"`
+}
+
+type BasicCalculationResponse struct {
+	Result int `json:"result"`
 }
 
 func GetAdd(w http.ResponseWriter, r *http.Request) {
@@ -46,14 +46,14 @@ func GetAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	slog.Info(fmt.Sprintf("%s %s %s request with body: %s", sUuid, r.Method, r.URL.Path, bodyBytes))
-	body := &SimpleCalculationRequest{}
+	body := &BasicCalculationRequest{}
 	if err := json.Unmarshal(bodyBytes, &body); err != nil {
 		msg := fmt.Sprintf("%s Error parsing body!", sUuid)
 		slog.Error(msg)
 		http.Error(w, msg, 400)
 	}
 
-	responseBody := &SimpleCalculationResponse{}
+	responseBody := &BasicCalculationResponse{}
 	responseBody.Result = body.Number1 + body.Number2
 
 	slog.Info(fmt.Sprintf("%s Sending response 200 OK with body: %+v", sUuid, responseBody))
