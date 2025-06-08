@@ -40,8 +40,8 @@ func endpointSubtract(w http.ResponseWriter, r *http.Request) {
 
 func endpointMultiply(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	// case http.MethodGet:
-	// 	handlers.GetMultiply(w, r)
+	case http.MethodGet:
+		handlers.GetMultiply(w, r)
 	default:
 		http.Error(w, constants.METHOD_NOT_ALLOWED, http.StatusMethodNotAllowed)
 	}
