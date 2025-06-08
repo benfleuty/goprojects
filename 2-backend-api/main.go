@@ -13,9 +13,9 @@ func main() {
 
 func defineApiRoutes() {
 	http.HandleFunc("/add", endpointAdd)
-	http.HandleFunc("/subtract/", endpointSubtract)
-	http.HandleFunc("/multiply/", endpointMultiply)
-	http.HandleFunc("/divide/", endpointDivide)
+	http.HandleFunc("/subtract", endpointSubtract)
+	http.HandleFunc("/multiply", endpointMultiply)
+	http.HandleFunc("/divide", endpointDivide)
 
 	http.ListenAndServe(":42069", nil)
 }
