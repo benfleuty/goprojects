@@ -34,31 +34,43 @@ type BasicCalculationResponse struct {
 	Result int `json:"result"`
 }
 
-func GetAdd(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-	sUuid := uuid.NewString()
+func parseBasicCalculationRequest(w http.ResponseWriter, r *http.Request, sUuid string) (BasicCalculationRequest, error) {
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		msg := fmt.Sprintf("%s %s %s Error reading request body: %v", sUuid, r.Method, r.URL.Path, err)
 		slog.Error(msg)
 		http.Error(w, msg, 500)
-		return
+		return BasicCalculationRequest{}, err
 	}
 
 	slog.Info(fmt.Sprintf("%s %s %s request with body: %s", sUuid, r.Method, r.URL.Path, bodyBytes))
-	body := &BasicCalculationRequest{}
-	if err := json.Unmarshal(bodyBytes, &body); err != nil {
+	request := BasicCalculationRequest{}
+	if err := json.Unmarshal(bodyBytes, &request); err != nil {
 		msg := fmt.Sprintf("%s Error parsing body!", sUuid)
 		slog.Error(msg)
 		http.Error(w, msg, 400)
 	}
 
-	responseBody := &BasicCalculationResponse{}
-	responseBody.Result = body.Number1 + body.Number2
+	return request, nil
+}
 
-	slog.Info(fmt.Sprintf("%s Sending response 200 OK with body: %+v", sUuid, responseBody))
+func GetAdd(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	sUuid := uuid.NewString()
 
-	SetResponse(w, 200, responseBody)
+	var request BasicCalculationRequest
+	if req, err := parseBasicCalculationRequest(w, r, sUuid); err != nil {
+		return
+	} else {
+		request = req
+	}
+
+	var response BasicCalculationResponse
+	response.Result = request.Number1 + request.Number2
+
+	slog.Info(fmt.Sprintf("%s Sending response 200 OK with body: %+v", sUuid, response))
+
+	SetResponse(w, 200, response)
 }
 
 func GetSubtract(w http.ResponseWriter, r *http.Request) {
